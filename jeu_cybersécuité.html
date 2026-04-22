@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberBank Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body {font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:white;text-align:center;margin:0}
+.container{max-width:650px;margin:auto;padding:20px}
+.card{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);padding:25px;border-radius:20px;margin-top:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);animation:fadeIn .5s}
+button{padding:12px 18px;margin:10px;border:none;border-radius:12px;cursor:pointer;font-weight:500;transition:.3s}
+button:hover{transform:scale(1.08)}
+.neutral{background:#3b82f6;color:white}
+.progress{height:8px;background:rgba(255,255,255,.2);border-radius:10px;margin-top:15px;overflow:hidden}
+.progress-bar{height:100%;background:#22c55e;width:0%;transition:.3s}
+.badge{margin-top:10px;padding:10px 15px;background:gold;color:black;border-radius:12px;display:inline-block;font-weight:600}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.result-emoji{font-size:50px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔐 CyberBank Challenge</h1>
+<p>20 situations… saurez-vous éviter les pièges ?</p>
+<div class="progress"><div id="bar" class="progress-bar"></div></div>
+<div id="game" class="card"></div>
+<div id="result" class="card" style="display:none"></div>
+</div>
+
+<script>
+let score=0,current=0;
+
+const questions=[
+{q:"Un email urgent: 'Votre compte sera bloqué dans 10 min !'.",options:[{text:"Cliquer vite",points:0},{text:"Analyser",points:10},{text:"Vérifier site officiel",points:20}]},
+{q:"Un lien avec logo parfait mais URL bizarre.",options:[{text:"Faire confiance",points:0},{text:"Vérifier URL",points:20},{text:"Ignorer",points:10}]},
+{q:"Un ami envoie un fichier inattendu.",options:[{text:"Ouvrir",points:0},{text:"Demander",points:20},{text:"Ignorer",points:10}]},
+{q:"Mot de passe ?",options:[{text:"123456",points:0},{text:"Nom+date",points:10},{text:"Complexe",points:20}]},
+{q:"Wi-Fi public + banque.",options:[{text:"Connexion",points:0},{text:"VPN",points:20},{text:"Attendre",points:10}]},
+{q:"SMS gain bancaire.",options:[{text:"Cliquer",points:0},{text:"Supprimer",points:10},{text:"Signaler",points:20}]},
+{q:"Même mot de passe partout ?",options:[{text:"Oui",points:0},{text:"Parfois",points:10},{text:"Jamais",points:20}]},
+{q:"Notif inconnue.",options:[{text:"Ignorer",points:0},{text:"Vérifier",points:20},{text:"Attendre",points:10}]},
+{q:"App non officielle.",options:[{text:"Installer",points:0},{text:"Vérifier",points:20},{text:"Tester",points:10}]},
+{q:"Email suspect mais parfait.",options:[{text:"Croire",points:0},{text:"Analyser",points:20},{text:"Ignorer",points:10}]},
+{q:"Clé USB trouvée.",options:[{text:"Brancher",points:0},{text:"Ignorer",points:20},{text:"Tester",points:10}]},
+{q:"Site sans HTTPS.",options:[{text:"Continuer",points:0},{text:"Quitter",points:20},{text:"Tester",points:10}]},
+{q:"Collègue demande accès.",options:[{text:"Donner",points:0},{text:"Refuser",points:20},{text:"Hésiter",points:10}]},
+{q:"Mise à jour urgente.",options:[{text:"Installer",points:0},{text:"Vérifier",points:20},{text:"Ignorer",points:10}]},
+{q:"Mot de passe écrit.",options:[{text:"Oui",points:0},{text:"Parfois",points:10},{text:"Jamais",points:20}]},
+{q:"Double authentification ?",options:[{text:"Non",points:0},{text:"Parfois",points:10},{text:"Oui",points:20}]},
+{q:"Lien raccourci.",options:[{text:"Cliquer",points:0},{text:"Analyser",points:20},{text:"Ignorer",points:10}]},
+{q:"Pièce jointe suspecte.",options:[{text:"Ouvrir",points:0},{text:"Scanner",points:20},{text:"Supprimer",points:10}]},
+{q:"Connexion inconnue.",options:[{text:"Ignorer",points:0},{text:"Sécuriser",points:20},{text:"Attendre",points:10}]},
+{q:"Banque demande codes.",options:[{text:"Donner",points:0},{text:"Refuser",points:20},{text:"Hésiter",points:10}]}
+];
+
+function updateBar(){document.getElementById('bar').style.width=(current/questions.length*100)+"%"}
+
+function showQuestion(){
+if(current>=questions.length)return showResult();
+let q=questions[current];
+let html=`<h3>(${current+1}/20) ${q.q}</h3>`;
+q.options.forEach(opt=>{html+=`<button class="neutral" onclick="answer(${opt.points})">${opt.text}</button><br>`});
+document.getElementById('game').innerHTML=html;
+updateBar();
+}
+
+function answer(points){score+=points;current++;showQuestion()}
+
+function showResult(){
+document.getElementById('game').style.display='none';
+document.getElementById('result').style.display='block';
+
+let profile="",emoji="",message="";
+
+if(score<150){
+profile="🔴 Détective débutant";
+emoji="😬";
+message="Vous êtes une cible facile... mais vous pouvez progresser !";
+}
+else if(score<300){
+profile="🟠 Gardien vigilant";
+emoji="😎";
+message="Pas mal ! Vous évitez déjà plusieurs pièges.";
+}
+else{
+profile="🟢 Hacker éthique";
+emoji="🧠";
+message="Impressionnant ! Vous maîtrisez la cybersécurité.";
+}
+
+let badge=score>=300?"<div class='badge'>🏅 Expert Cybersécurité</div>":"";
+
+document.getElementById('result').innerHTML=`
+<div class="result-emoji">${emoji}</div>
+<h2>Score : ${score}/400</h2>
+<h2>${profile}</h2>
+<p>${message}</p>
+${badge}
+<h3>Conseils personnalisés</h3>
+<ul>
+<li>Ne partagez jamais vos informations sensibles</li>
+<li>Vérifiez toujours les liens et expéditeurs</li>
+<li>Activez la double authentification</li>
+</ul>
+<h3>Simulation finale</h3>
+<p>⚠️ Une attaque de phishing a été simulée… et vous avez ${score<300?"été testé":"brillamment résisté"}.</p>
+`;
+updateBar();
+}
+
+showQuestion();
+</script>
+</body>
+</html>
